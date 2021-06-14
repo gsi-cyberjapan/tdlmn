@@ -86,20 +86,22 @@ module DownloadTile
             retry
           end
 
-          buf_md5 = Digest::MD5.hexdigest(buf)
-          if o[:md5] != buf_md5
-            $logger.error("MD5エラー : #{o[:url]}")
-            $status[:ng] += 1
-          else
-            [File.dirname(o[:local_path])].each{|it|
-              FileUtils.mkdir_p(it) unless File.directory?(it)
-            }
+          if buf != nil
+            buf_md5 = Digest::MD5.hexdigest(buf)
+            if o[:md5] != buf_md5
+              $logger.error("MD5エラー : #{o[:url]}")
+              $status[:ng] += 1
+            else
+              [File.dirname(o[:local_path])].each{|it|
+                FileUtils.mkdir_p(it) unless File.directory?(it)
+              }
 
-            File.open("#{o[:local_path]}", 'wb') {|w| w.print buf}
+              File.open("#{o[:local_path]}", 'wb') {|w| w.print buf}
 
-            File.utime(o[:date], o[:date], o[:local_path])
+              File.utime(o[:date], o[:date], o[:local_path])
 
-            $status[:ok] += 1
+              $status[:ok] += 1
+            end
           end
         end
       end
